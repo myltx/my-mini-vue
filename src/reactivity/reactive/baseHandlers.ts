@@ -1,4 +1,5 @@
 import { track, trigger } from "../effect/effect";
+import { ReactiveFlags } from "./reactive";
 
 const get = createGetter();
 const set = createSetter();
@@ -7,6 +8,11 @@ const readonlyGet = createGetter(true);
 function createGetter(isReadonly?) {
   return function get(target, key) {
     let res = Reflect.get(target, key);
+    if (key === ReactiveFlags.IS_REACTIVE) {
+      return !isReadonly;
+    } else if (key === ReactiveFlags.IS_READONLY) {
+      return isReadonly;
+    }
     // TODO: 进行依赖收集
     if (!isReadonly) {
       track(target, key);
