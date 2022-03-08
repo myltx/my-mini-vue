@@ -1,4 +1,4 @@
-import { track, trigger } from "../effect/effect";
+import { mutableHandlers, readonlyHandlers } from "./baseHandlers";
 
 /**
  * reactive 方法
@@ -13,19 +13,15 @@ import { track, trigger } from "../effect/effect";
  * 	Proxy   https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
  * 	Reflect https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
  */
+
 export function reactive(raw) {
-  return new Proxy(raw, {
-    get(target, key) {
-      let res = Reflect.get(target, key);
-      // TODO: 进行依赖收集
-      track(target, key);
-      return res;
-    },
-    set(target, key, value) {
-      let res = Reflect.set(target, key, value);
-      // TODO: 进行依赖触发
-      trigger(target, key);
-      return res;
-    },
-  });
+  return createProxy(raw, mutableHandlers);
+}
+
+export function readonly(raw) {
+  return createProxy(raw, readonlyHandlers);
+}
+
+function createProxy(raw: any, baseHandlers) {
+  return new Proxy(raw, baseHandlers);
 }

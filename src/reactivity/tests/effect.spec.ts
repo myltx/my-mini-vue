@@ -29,7 +29,7 @@ describe("effect", () => {
     expect(foo).toBe(12);
     expect(r).toBe("foo");
   });
-   it("scheduler", () => {
+  it("scheduler", () => {
     // 1. effect  接受第二个参数 是一个 options
     // 2. 第一次执行 effect 的时候 还会执行fn
     // 3. 当 set -> update 的时候，不会执行 fn 会执行 scheduler
@@ -79,5 +79,23 @@ describe("effect", () => {
     // 重新执行 runner runner 重新打开响应式  可以更寻 dummy
     runner();
     expect(dummy).toBe(3);
+  });
+  // 测试 onStop 功能
+  it("onStop", () => {
+    let obj = reactive({
+      foo: 1,
+    });
+    const onStop = jest.fn();
+    let dummy;
+    const runner = effect(
+      () => {
+        dummy = obj.foo;
+      },
+      {
+        onStop,
+      }
+    );
+    stop(runner);
+    expect(onStop).toBeCalledTimes(1);
   });
 });
