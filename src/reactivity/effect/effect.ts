@@ -6,18 +6,24 @@
  * 	2.直接触发fn
  *	3.提供收集依赖方法，当触发 get 方法时 调用 track 方法  进行依赖收集
  *	4.提供执行依赖方法，当触发 set 方法时 调用 trigger 方法 执行收集到的所有依赖
- *
+ *  5.提供stop方法，调用时停止传入runner的执行
  */
 
 // 通过对象形式创建
 class ReactiveEffect {
   private _fn: any;
+  deps = [];
   constructor(fn) {
     this._fn = fn;
   }
   run() {
     activeEffect = this;
     return this._fn();
+  }
+  stop() {
+    this.deps.forEach((dep: any) => {
+      dep.delete(this);
+    });
   }
 }
 
@@ -42,6 +48,8 @@ export function track(target, key) {
     depMaps.set(key, dep);
   }
   dep.add(activeEffect);
+  // 为了在执行 stop 方法时可以取到当前 effect 所有的 dep
+  activeEffect.deps.push(dep);
 }
 
 /**
@@ -64,5 +72,17 @@ let activeEffect;
 export function effect(fn) {
   const _effect = new ReactiveEffect(fn);
   _effect.run();
-  return _effect.run.bind(_effect);
+  const runner: any = _effect.run.bind(_effect);
+  // runner 挂载 effect 实例
+  runner.effect = _effect;
+  return runner;
+}
+
+/**
+ * stop
+ * 参数：fn
+ * 当调用此方法时，会停止 传入 fn 的响应式
+ */
+export function stop(runner) {
+  runner.effect.stop();
 }
