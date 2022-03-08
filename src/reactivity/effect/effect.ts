@@ -12,8 +12,9 @@
 // 通过对象形式创建
 class ReactiveEffect {
   private _fn: any;
-  deps = [];
-  constructor(fn) {
+  public;
+  deps = []
+  constructor(fn, public scheduler?) {
     this._fn = fn;
   }
   run() {
@@ -61,16 +62,21 @@ export function trigger(target, key) {
   // 根据 target 获取到depMaps
   let depMaps = targetMaps.get(target);
   // 根据 key 获取到 deps
-  let deps = depMaps.get(key);
+  let dep = depMaps.get(key);
   // 循环 deps 执行每一个 fn => run
-  for (const dep of deps) {
-    dep.run();
+  for (const effect of dep) {
+    if (effect.scheduler) {
+      effect.scheduler();
+    } else {
+      effect.run();
+    }
   }
 }
 
 let activeEffect;
-export function effect(fn) {
-  const _effect = new ReactiveEffect(fn);
+export function effect(fn, options: any = {}) {
+  const _effect = new ReactiveEffect(fn, options.scheduler);
+  // 开始就会执行一次
   _effect.run();
   const runner: any = _effect.run.bind(_effect);
   // runner 挂载 effect 实例
