@@ -11,6 +11,9 @@
 
 import { extend } from "../shared";
 
+let activeEffect;
+let shouldTrack;
+
 // 通过对象形式创建
 class ReactiveEffect {
   private _fn: any;
@@ -22,8 +25,15 @@ class ReactiveEffect {
     this._fn = fn;
   }
   run() {
+    // 判断是不是被 stop 的状态
+    if (!this.active) {
+      return this._fn();
+    }
+    shouldTrack = true;
     activeEffect = this;
-    return this._fn();
+    const result = this._fn();
+    shouldTrack = false;
+    return result;
   }
   stop() {
     if (this.active) {
@@ -40,6 +50,7 @@ function cleanupEffect(effect) {
   effect.deps.forEach((dep: any) => {
     dep.delete(effect);
   });
+  effect.deps.length = 0;
 }
 
 let targetMaps = new Map();
@@ -49,6 +60,7 @@ let targetMaps = new Map();
  *
  */
 export function track(target, key) {
+  if (!isTrackIng()) return;
   // target -> key -> dep
   let depMaps = targetMaps.get(target);
   // 处理初始化逻辑， 当初始化时没有 depMaps 就创建一个添加到 targetMaps 中
@@ -62,10 +74,15 @@ export function track(target, key) {
     dep = new Set();
     depMaps.set(key, dep);
   }
-  if (!activeEffect) return;
+  // 如果 activeEffect 已经被收集 就 return 不需要再次收集
+  if (dep.has(activeEffect)) return;
   dep.add(activeEffect);
   // 为了在执行 stop 方法时可以取到当前 effect 所有的 dep
   activeEffect.deps.push(dep);
+}
+
+function isTrackIng() {
+  return shouldTrack && activeEffect !== undefined;
 }
 
 /**
@@ -88,7 +105,6 @@ export function trigger(target, key) {
   }
 }
 
-let activeEffect;
 export function effect(fn, options: any = {}) {
   const _effect = new ReactiveEffect(fn, options.scheduler);
   extend(_effect, options);

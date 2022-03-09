@@ -73,7 +73,8 @@ describe("effect", () => {
     // 执行 stop 停止 runner 响应式
     stop(runner);
     // obj.prop 改变时 不会更新
-    obj.prop = 3;
+    // obj.prop = 3;
+    obj.prop++;
     // 所以结果 dummy 还是 2
     expect(dummy).toBe(2);
     // 重新执行 runner runner 重新打开响应式  可以更寻 dummy
