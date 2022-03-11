@@ -1,4 +1,8 @@
-import { mutableHandlers, readonlyHandlers } from "./baseHandlers";
+import {
+  mutableHandlers,
+  readonlyHandlers,
+  shallowReadonlyHandlers,
+} from "./baseHandlers";
 
 /**
  * reactive 方法
@@ -27,6 +31,9 @@ export function readonly(raw) {
   return createProxy(raw, readonlyHandlers);
 }
 
+export function shallowReadonly(raw) {
+  return createProxy(raw, shallowReadonlyHandlers);
+}
 export function isReactive(value) {
   return !!value[ReactiveFlags.IS_REACTIVE];
 }
