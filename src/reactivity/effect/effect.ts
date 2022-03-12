@@ -74,6 +74,13 @@ export function track(target, key) {
     dep = new Set();
     depMaps.set(key, dep);
   }
+  trackEffects(dep);
+}
+
+/**
+ * 依赖收集封装
+ */
+export function trackEffects(dep) {
   // 如果 activeEffect 已经被收集 就 return 不需要再次收集
   if (dep.has(activeEffect)) return;
   dep.add(activeEffect);
@@ -81,7 +88,7 @@ export function track(target, key) {
   activeEffect.deps.push(dep);
 }
 
-function isTrackIng() {
+export function isTrackIng() {
   return shouldTrack && activeEffect !== undefined;
 }
 
@@ -95,6 +102,10 @@ export function trigger(target, key) {
   let depMaps = targetMaps.get(target);
   // 根据 key 获取到 deps
   let dep = depMaps.get(key);
+  triggerEffects(dep);
+}
+
+export function triggerEffects(dep) {
   // 循环 deps 执行每一个 fn => run
   for (const effect of dep) {
     if (effect.scheduler) {

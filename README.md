@@ -1,6 +1,5 @@
 ### mini-vue 实现
 
-
 ### 实现功能
 
 - [x] reactive
@@ -8,3 +7,5 @@
 - [x] readonly
 - [x] isReactive
 - [x] isReadonly
+- [x] isProxy
+- [x] ref
