@@ -4,18 +4,16 @@
 
 #### reactivity
 
-    - [x] reactive
-    - [x] effect
-    - [x] readonly
-    - [x] isReactive
-    - [x] isReadonly
-    - [x] isProxy
-    - [x] ref
-    - [x] isRef
-    - [x] unRef
-    - [x] proxyRef
-    - [x] computed
+    reactive
+    effect
+    readonly
+    isReactive
+    isReadonly
+    isProxy
+    ref
+    isRef
+    unRef
+    proxyRef
+    computed
 
-runtime-core 初始化
-
-    - [ ] component
+#### runtime-core
