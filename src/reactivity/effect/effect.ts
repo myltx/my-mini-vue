@@ -15,7 +15,7 @@ let activeEffect;
 let shouldTrack;
 
 // 通过对象形式创建
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn: any;
   public;
   active = true;

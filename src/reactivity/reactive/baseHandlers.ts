@@ -29,6 +29,11 @@ function createGetter(isReadonly?, shallow?) {
   };
 }
 
+/**
+ * 使用到的方法:
+ * 	Proxy   https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+ * 	Reflect https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Reflect
+ * */
 function createSetter() {
   return function set(target, key, value) {
     let res = Reflect.set(target, key, value);
