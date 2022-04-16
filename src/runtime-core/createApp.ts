@@ -10,7 +10,7 @@ export function createApp(rootComponent) {
       // 先转换为虚拟节点 vnode
       // component -> vnode
       // 后续所有逻辑操作 都会基于 vnode 处理
-      const vnode = createVNode(rootContainer);
+      const vnode = createVNode(rootComponent);
       render(vnode, rootContainer);
     },
   };
