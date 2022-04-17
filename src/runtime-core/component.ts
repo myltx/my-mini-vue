@@ -1,6 +1,7 @@
 import { shallowReadonly } from "../reactivity/reactive/reactive";
 import { emit } from "./componentEmit";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
+import { initSlots } from "./componentSlot";
 import { initProps } from "./componentsProps";
 
 export function createComponentInstance(vnode: any) {
@@ -9,6 +10,7 @@ export function createComponentInstance(vnode: any) {
     type: vnode.type,
     setupState: {},
     props: {},
+    slots: {},
     emit: () => {},
   };
   // bind -> https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
@@ -20,7 +22,7 @@ export function setupComponent(instance) {
   // TODO: 这里初始化props slots的方法占位 后续实现
   // 初始化props
   initProps(instance, instance.vnode.props);
-  // initSlots()
+  initSlots(instance, instance.vnode.children);
   // 处理有状态的组件
   setupStatefulComponent(instance);
 }
