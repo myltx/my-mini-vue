@@ -4,9 +4,14 @@ const publicPropertiesMap = {
 
 export const PublicInstanceProxyHandlers = {
   get({ _: instance }, key) {
-    const { setupState } = instance;
-    if (key in setupState) {
+    const { setupState, props } = instance;
+    const hasOwn = (val, key) => Object.prototype.hasOwnProperty.call(val, key);
+    if (hasOwn(setupState, key)) {
       return setupState[key];
+    }
+    // 处理 组件传入的 props
+    if (hasOwn(props, key)) {
+      return props[key];
     }
     // 判断key 是不是$el 如果是 就返回 vnode 的el
     const publicGetter = publicPropertiesMap[key];
