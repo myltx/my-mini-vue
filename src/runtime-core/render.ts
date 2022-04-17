@@ -64,6 +64,7 @@ function mountComponent(initialVNode: any, container: any) {
 function setupRenderEffect(instance: any, initialVNode: any, container: any) {
   // 获取setup的数据 绑定到render this 上
   const { proxy } = instance;
+  // call -> https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call
   const subTree = instance.render.call(proxy);
   // subTree => 虚拟节点树 app.js 中设置的 h
   // vnode => path

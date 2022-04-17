@@ -24,6 +24,7 @@
 > - shapeFlags
 > - 注册事件
 > - props 逻辑
+> - emit 逻辑
 
 >
 
