@@ -1,3 +1,5 @@
+import { hasOwn } from "../reactivity/shared";
+
 const publicPropertiesMap = {
   $el: (i) => i.vnode.el,
 };
@@ -5,7 +7,6 @@ const publicPropertiesMap = {
 export const PublicInstanceProxyHandlers = {
   get({ _: instance }, key) {
     const { setupState, props } = instance;
-    const hasOwn = (val, key) => Object.prototype.hasOwnProperty.call(val, key);
     if (hasOwn(setupState, key)) {
       return setupState[key];
     }
