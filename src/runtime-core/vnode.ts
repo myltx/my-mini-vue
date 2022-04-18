@@ -1,6 +1,8 @@
 // 创建虚拟节点
 // 接收是三个参数 后两个可选
 import { ShapeFlags } from "../shared/ShapeFlags";
+export const Fragment = Symbol("Fragment");
+export const Text = Symbol("Text");
 export function createVNode(type, props?, children?) {
   const vnode = {
     type,
@@ -26,4 +28,9 @@ function getShapeFlag(type: any) {
   return typeof type === "string"
     ? ShapeFlags.ELEMENT
     : ShapeFlags.STATEFUL_COMPONENT;
+}
+
+// 创建slot text 形式的虚拟节点
+export function createTextVNode(text: string) {
+  return createVNode(Text, {}, text);
 }

@@ -26,6 +26,8 @@
 > - props 逻辑
 > - emit 逻辑
 > - slots 逻辑
+> - fragment text 逻辑
+> - getCurrentInstance 功能实现
 
 >
 
