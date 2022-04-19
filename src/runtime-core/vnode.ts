@@ -1,6 +1,7 @@
 // 创建虚拟节点
 // 接收是三个参数 后两个可选
 import { ShapeFlags } from "../shared/ShapeFlags";
+// 用 symbol 作为唯一标识
 export const Fragment = Symbol("Fragment");
 export const Text = Symbol("Text");
 export function createVNode(type, props?, children?) {

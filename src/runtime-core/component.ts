@@ -4,11 +4,13 @@ import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { initSlots } from "./componentSlot";
 import { initProps } from "./componentsProps";
 
-export function createComponentInstance(vnode: any) {
+export function createComponentInstance(vnode: any, parent) {
   const component = {
     vnode,
     type: vnode.type,
     setupState: {},
+    provides: parent ? parent.provides : {},
+    parent,
     props: {},
     slots: {},
     emit: () => {},
