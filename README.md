@@ -29,6 +29,7 @@
 > - fragment text 逻辑
 > - getCurrentInstance 功能实现
 > - provide inject 功能实现
+> - custom renderer 实现
 
 
 > 课程学习地址
