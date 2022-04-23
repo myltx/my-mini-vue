@@ -4,7 +4,11 @@ import { createAppAPI } from "./createApp";
 import { Fragment, Text } from "./vnode";
 
 export function createRenderer(options) {
-  const { createElement, patchProp, insert } = options;
+  const {
+    createElement: hostCreateElement,
+    patchProp: hostPatchProp,
+    insert: hostInsert,
+  } = options;
   function render(vnode, container) {
     // 调用 patch 方法，为了方便后续递归处理
     patch(vnode, container, null);
@@ -55,7 +59,7 @@ export function createRenderer(options) {
     // 创建 dom 添加至我们的视图
     const { type, props, children, shapeFlag } = vnode;
     // vnode -> element -> div
-    let el = (vnode.el = createElement(type));
+    let el = (vnode.el = hostCreateElement(type));
     // 判断 children 是不是数组 如果是数组就 遍历 重新执行 patch
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
       el.textContent = children;
@@ -65,10 +69,10 @@ export function createRenderer(options) {
     // 处理所有的 props
     for (const key in props) {
       const val = props[key];
-      patchProp(el, key, val);
+      hostPatchProp(el, key, val);
     }
     // container.append(el);
-    insert(el, container);
+    hostInsert(el, container);
   }
   // 处理 children 的 dom
   function mountChildren(vnode: any, container: any, parentComponent) {
