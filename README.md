@@ -30,6 +30,7 @@
 > - getCurrentInstance 功能实现
 > - provide inject 功能实现
 > - custom renderer 实现
+> - element 初始化流程搭建
 
 
 > 课程学习地址
