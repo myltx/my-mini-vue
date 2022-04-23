@@ -27,10 +27,11 @@
 > - emit 逻辑
 > - slots 逻辑
 > - fragment text 逻辑
-> - getCurrentInstance 功能实现
-> - provide inject 功能实现
-> - custom renderer 实现
-> - element 初始化流程搭建
+> - getCurrentInstance 逻辑
+> - provide inject 逻辑
+> - custom renderer逻辑
+> - 更新 element 初始化流程搭建
+> - 更新 element props 逻辑
 
 
 > 课程学习地址

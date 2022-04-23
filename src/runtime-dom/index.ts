@@ -4,14 +4,19 @@ function createElement(type) {
   // console.log("createElement----------");
   return document.createElement(type);
 }
-function patchProp(el, key, val) {
-  // console.log("patchProp----------");
+function patchProp(el, key, preValue, nextValue) {
+  // console.log("PatchProp----------");
+  // console.log("preValue:", preValue);
   const isOn = (key: string) => /^on[A-Z]/.test(key);
   if (isOn(key)) {
     const event = key.slice(2).toLocaleLowerCase();
-    el.addEventListener(event, val);
+    el.addEventListener(event, nextValue);
   } else {
-    el.setAttribute(key, val);
+    if (nextValue === undefined || nextValue == null) {
+      el.removeAttribute(key, nextValue);
+    } else {
+      el.setAttribute(key, nextValue);
+    }
   }
 }
 function insert(el, parent) {

@@ -1,4 +1,5 @@
 import { effect } from "../reactivity/effect/effect";
+import { EMPTY_OBJ } from "../reactivity/shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { createAppAPI } from "./createApp";
@@ -67,9 +68,36 @@ export function createRenderer(options) {
   // 处理 element 更新对比
   function patchElement(n1, n2, container) {
     console.log("patchComponent-------");
-    console.log("n1:", n1);
-    console.log("n2:", n2);
+    // console.log("n1:", n1);
+    // console.log("n2:", n2);
     console.log("我是更新");
+    // 因为更新时 n2 是没有 el 的所有需要将 n1 的 el 赋值给他
+    const el = (n2.el = n1.el);
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+    patchProps(el, oldProps, newProps);
+  }
+  // 处理更新时的 props
+  function patchProps(el, oldProps: any, newProps: any) {
+    if (oldProps !== newProps) {
+      // 遍历 newProps 与 oldProps 对比 判断是修改还是删除
+      for (const key in newProps) {
+        const prevProp: any = oldProps[key];
+        const nextProp: any = newProps[key];
+        if (prevProp !== newProps) {
+          hostPatchProp(el, key, prevProp, nextProp);
+        }
+      }
+      // 遍历 oldProps 判断 key 在 newProps 中是否存在
+      // 如果不存在就删除
+      if (oldProps !== EMPTY_OBJ) {
+        for (const key in oldProps) {
+          if (!(key in newProps)) {
+            hostPatchProp(el, key, oldProps[key], null);
+          }
+        }
+      }
+    }
   }
   function mountElement(vnode: any, container: any, parentComponent) {
     // 创建 dom 添加至我们的视图
@@ -85,7 +113,7 @@ export function createRenderer(options) {
     // 处理所有的 props
     for (const key in props) {
       const val = props[key];
-      hostPatchProp(el, key, val);
+      hostPatchProp(el, key, null, val);
     }
     // container.append(el);
     hostInsert(el, container);
