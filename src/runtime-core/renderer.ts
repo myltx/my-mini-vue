@@ -128,6 +128,20 @@ export function createRenderer(options) {
       }
       i++;
     }
+
+    // 右侧
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1];
+      const n2 = c2[e2];
+      // 如果相等 就执行 patch 判断下级是不是相等
+      if (isSomeVNodeType(n1, n2)) {
+        patch(n1, n2, container, parentComponent);
+      } else {
+        break;
+      }
+      e1--;
+      e2--;
+    }
   }
 
   // 删除 节点下的所有 children
