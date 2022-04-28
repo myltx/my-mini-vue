@@ -19,9 +19,12 @@ function patchProp(el, key, preValue, nextValue) {
     }
   }
 }
-function insert(el, parent) {
+function insert(child, parent, anchor) {
   // console.log("insert----------");
-  parent.append(el);
+  // parent.append(child);
+  // https://developer.mozilla.org/zh-CN/docs/Web/API/Node/insertBefore
+  // Node.insertBefore() 方法在参考节点之前插入一个拥有指定父节点的子节点
+  parent.insertBefore(child, anchor || null);
 }
 
 function remove(child) {
