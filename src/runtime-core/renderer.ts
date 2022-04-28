@@ -77,11 +77,11 @@ export function createRenderer(options) {
     const el = (n2.el = n1.el);
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
-    parchChildren(n1, n2, el, parentComponent);
+    patchChildren(n1, n2, el, parentComponent);
     patchProps(el, oldProps, newProps);
   }
   // 处理更新时的 children
-  function parchChildren(n1, n2, container, parentComponent) {
+  function patchChildren(n1, n2, container, parentComponent) {
     const { shapeFlag: prevShapeFlag } = n1;
     const c1 = n1.children;
     const { shapeFlag } = n2;
@@ -101,9 +101,35 @@ export function createRenderer(options) {
       if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
         hostSetElementText(container, "");
         mountChildren(c2, container, parentComponent);
+      } else {
+        // array diff array
+        patchKeyedChildren(c1, c2, container, parentComponent);
       }
     }
   }
+
+  // 处理数组对比数组
+  function patchKeyedChildren(c1, c2, container, parentComponent) {
+    let i = 0;
+    let e1 = c1.length - 1;
+    let e2 = c2.length - 1;
+    function isSomeVNodeType(n1, n2) {
+      return n1.type === n2.type && n1.key === n2.key;
+    }
+    // 左侧对比
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i];
+      const n2 = c2[i];
+      // 如果相等 就执行 patch 判断下级是不是相等
+      if (isSomeVNodeType(n1, n2)) {
+        patch(n1, n2, container, parentComponent);
+      } else {
+        break;
+      }
+      i++;
+    }
+  }
+
   // 删除 节点下的所有 children
   function unmountChildren(children) {
     for (let i = 0; i < children.length; i++) {
