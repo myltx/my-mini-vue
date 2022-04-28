@@ -142,6 +142,12 @@ export function createRenderer(options) {
       e1--;
       e2--;
     }
+    // 新的比老的多
+    if (i > e1) {
+      if (i <= e2) {
+        patch(null, c2[i], container, parentComponent);
+      }
+    }
   }
 
   // 删除 节点下的所有 children
