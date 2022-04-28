@@ -33,6 +33,7 @@
 > - 更新 element 初始化流程搭建
 > - 更新 element props 逻辑
 > - 更新 element children (text -> array 、array -> text、text -> text) 逻辑
+> - 更新 element diff 双端对比算法 逻辑（1）
 
 > 课程学习地址
 > ![dce7da28dbf31cf13f2e1d8a2585e29](https://user-images.githubusercontent.com/29727848/159952869-17f82eec-2a21-4dfd-95fa-bb589549c9a0.jpg)

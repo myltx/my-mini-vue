@@ -167,15 +167,22 @@ export function createRenderer(options) {
       e1--;
       e2--;
     }
-    // 新的比老的多 左侧对比 右侧对比
+    // 新的比老的多 创建
     if (i > e1) {
       if (i <= e2) {
-        const nextPos = i + 1;
+        const nextPos = e2 + 1;
         const anchor = nextPos < l2 ? c2[nextPos].el : null;
         while (i <= e2) {
           patch(null, c2[i], container, parentComponent, anchor);
           i++;
         }
+      }
+    }
+    // 老的比新的多 删除
+    else if (i > e2) {
+      while (i <= e1) {
+        hostRemove(c1[i].el);
+        i++;
       }
     }
   }
