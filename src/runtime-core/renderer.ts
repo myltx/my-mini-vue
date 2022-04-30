@@ -87,10 +87,10 @@ export function createRenderer(options) {
   }
   // 处理 element 更新对比
   function patchElement(n1, n2, container, parentComponent, anchor) {
-    console.log("patchComponent-------");
+    // console.log("patchComponent-------");
     // console.log("n1:", n1);
     // console.log("n2:", n2);
-    console.log("我是更新");
+    // console.log("我是更新");
     // 因为更新时 n2 是没有 el 的所有需要将 n1 的 el 赋值给他
     const el = (n2.el = n1.el);
     const oldProps = n1.props || EMPTY_OBJ;
@@ -191,11 +191,18 @@ export function createRenderer(options) {
       let s2 = i;
       // 记录新数组的数量
       // 执行累加数
-      // 当 大于 等于 时 就相当于后边的都需要删除掉
+      // 当 patched 大于 等于 toBePatched 时 就相当于后边的都需要删除掉
       const toBePatched = e2 - s2 + 1;
       let patched = 0;
-      // 存储新的 数组中不同的元素 的映射关系
+      // 存储新的 数组中不同的元素 的映射表
       const keyToNewIndexMap = new Map();
+      // 建立新旧关系 映射表 设置固定长度  可以优化性能
+      const newIndexToOldIndexMap = new Array(toBePatched);
+      // 记录是否需要移动状态
+      let moved = false;
+      let maxNewIndexSoFar = 0;
+      // 初始化所有的映射为 0 ，为 0 的时候代表还未建立映射
+      for (let i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0;
 
       // 遍历新的数组将 值添加至map  key:i
       for (let i = s2; i <= e2; i++) {
@@ -228,8 +235,38 @@ export function createRenderer(options) {
         if (newINdex === undefined) {
           hostRemove(prevChild.el);
         } else {
+          // 如果新的点 大于等于 maxNewIndexSoFar
+          if (newINdex >= maxNewIndexSoFar) {
+            maxNewIndexSoFar = newINdex;
+          } else {
+            moved = true;
+          }
+          // i + 1 是因为 初始化 newIndexToOldIndexMap 的时候为 0  所以需要进行  + 1
+          newIndexToOldIndexMap[newINdex - s2] = i + 1;
           patch(prevChild, c2[newINdex], container, parentComponent, null);
           patched++;
+        }
+      }
+      // 生成最长递增子序列
+      const increasingNewIndexSequence = moved
+        ? getSequence(newIndexToOldIndexMap)
+        : [];
+      let j = increasingNewIndexSequence.length - 1; // 最长递增子序列 指针
+      // 使用倒叙处理 是为了保证 锚点的准确性
+      for (let i = toBePatched - 1; i >= 0; i--) {
+        const nextIndex = i + s2;
+        const nextChild = c2[nextIndex];
+        // 判断锚点是不是存在于 c2 如果不在 就是 null 追加在最后边
+        const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : null;
+        // 如果新的不存在与映射表 那么就是新增
+        if (newIndexToOldIndexMap[i] === 0) {
+          patch(null, nextChild, container, parentComponent, anchor);
+        } else if (moved) {
+          if (j < 0 || i !== increasingNewIndexSequence[j]) {
+            hostInsert(nextChild.el, container, anchor);
+          } else {
+            j--;
+          }
         }
       }
     }
@@ -343,4 +380,45 @@ export function createRenderer(options) {
   return {
     createApp: createAppAPI(render),
   };
+}
+// 获取最长递增子序列
+function getSequence(arr: number[]): number[] {
+  const p = arr.slice();
+  const result = [0];
+  let i, j, u, v, c;
+  const len = arr.length;
+  for (i = 0; i < len; i++) {
+    const arrI = arr[i];
+    if (arrI !== 0) {
+      j = result[result.length - 1];
+      if (arr[j] < arrI) {
+        p[i] = j;
+        result.push(i);
+        continue;
+      }
+      u = 0;
+      v = result.length - 1;
+      while (u < v) {
+        c = (u + v) >> 1;
+        if (arr[result[c]] < arrI) {
+          u = c + 1;
+        } else {
+          v = c;
+        }
+      }
+      if (arrI < arr[result[u]]) {
+        if (u > 0) {
+          p[i] = result[u - 1];
+        }
+        result[u] = i;
+      }
+    }
+  }
+  u = result.length;
+  v = result[u - 1];
+  while (u-- > 0) {
+    result[u] = v;
+    v = p[v];
+  }
+  return result;
 }
