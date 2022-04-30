@@ -185,6 +185,54 @@ export function createRenderer(options) {
         i++;
       }
     }
+    // 中间对比
+    else {
+      let s1 = i;
+      let s2 = i;
+      // 记录新数组的数量
+      // 执行累加数
+      // 当 大于 等于 时 就相当于后边的都需要删除掉
+      const toBePatched = e2 - s2 + 1;
+      let patched = 0;
+      // 存储新的 数组中不同的元素 的映射关系
+      const keyToNewIndexMap = new Map();
+
+      // 遍历新的数组将 值添加至map  key:i
+      for (let i = s2; i <= e2; i++) {
+        const nextChild = c2[i];
+        keyToNewIndexMap.set(nextChild.key, i);
+      }
+
+      // 遍历旧的数组 新旧对比 处理逻辑
+      for (let i = s1; i <= e1; i++) {
+        const prevChild = c1[i];
+        if (patched >= toBePatched) {
+          hostRemove(prevChild.el);
+          continue;
+        }
+        let newINdex;
+        // 如果用户设置 key
+        if (prevChild.key != null) {
+          newINdex = keyToNewIndexMap.get(prevChild.key);
+        } else {
+          // 如果用户没有设置 key
+          for (let j = s2; j < e2; j++) {
+            if (isSomeVNodeType(prevChild, c2[j])) {
+              newINdex = j;
+              break;
+            }
+          }
+        }
+        // 判断 旧的  在不在新的里边 不在就执行删除
+        // 如果存就通过 patch 递归进行对比
+        if (newINdex === undefined) {
+          hostRemove(prevChild.el);
+        } else {
+          patch(prevChild, c2[newINdex], container, parentComponent, null);
+          patched++;
+        }
+      }
+    }
   }
 
   // 删除 节点下的所有 children
