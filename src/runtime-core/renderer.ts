@@ -223,7 +223,7 @@ export function createRenderer(options) {
           newINdex = keyToNewIndexMap.get(prevChild.key);
         } else {
           // 如果用户没有设置 key
-          for (let j = s2; j < e2; j++) {
+          for (let j = s2; j <= e2; j++) {
             if (isSomeVNodeType(prevChild, c2[j])) {
               newINdex = j;
               break;
