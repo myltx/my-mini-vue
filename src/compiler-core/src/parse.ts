@@ -13,7 +13,6 @@ function parseChildren(context) {
   let nodes: any = [];
   let node;
   const s = context.source;
-  console.log("context.source:--------" + s);
   // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
   if (s.startsWith("{{")) {
     node = parseInterpolation(context);
@@ -21,8 +20,8 @@ function parseChildren(context) {
     if (/[a-z]/i.test(s[1])) {
       node = parseElement(context);
     }
-  } else if (/[a-z]/i.test(s[0])) {
-    console.log("parse text");
+  } else {
+    //   if (/[a-z]|[0-9]|[\u4e00-\u9fa5]/i.test(s[0]))
     node = parseText(context);
   }
   nodes.push(node);
@@ -30,7 +29,19 @@ function parseChildren(context) {
 }
 
 // text 处理
-function parseText(context) {}
+function parseText(context) {
+  const content = parseTextData(context, context.source.length);
+  return {
+    type: NodeTypes.TEXT,
+    content,
+  };
+}
+
+function parseTextData(context, length) {
+  const content = context.source.slice(0, length);
+  advanceBy(context, length);
+  return content;
+}
 // element 处理
 function parseElement(context: any) {
   // 获取tag
@@ -61,9 +72,9 @@ function parseInterpolation(context) {
   advanceBy(context, openDelimiter.length);
 
   const rawContentLength = closeIndex - openDelimiter.length;
-  const rawContent = context.source.slice(0, rawContentLength);
+  const rawContent = parseTextData(context, rawContentLength);
   const content = rawContent.trim();
-  advanceBy(context, rawContentLength + closeDelimiter.length);
+  advanceBy(context, closeDelimiter.length);
   return {
     type: NodeTypes.INTERPOLATION,
     content: {
