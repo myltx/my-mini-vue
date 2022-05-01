@@ -1,11 +1,14 @@
-import { NodeTypes } from "./ast";
-
 // 1. 深度优先搜索
 // 2. 修改 text content
-export function transform(root, options) {
+export function transform(root, options = {}) {
   const context = createTransformsContext(root, options);
   // 1. 深度优先搜索
   traverseNode(root, context);
+  createRootCodegen(root);
+}
+
+function createRootCodegen(root: any) {
+  root.codegenNode = root.children[0];
 }
 // 处理传入的 ast 树 深度遍历寻找需要修改的 值
 function traverseNode(node: any, context) {
