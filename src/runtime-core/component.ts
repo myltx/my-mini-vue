@@ -12,6 +12,7 @@ export function createComponentInstance(vnode: any, parent) {
     setupState: {},
     provides: parent ? parent.provides : {},
     parent,
+    next: null,
     props: {},
     isMounted: false,
     subTree: {},

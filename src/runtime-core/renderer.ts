@@ -1,6 +1,7 @@
 import { effect } from "../reactivity/effect/effect";
 import { EMPTY_OBJ } from "../reactivity/shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
+import { shouldUpdateComponent } from "./compomentUpdateUtils";
 import { createComponentInstance, setupComponent } from "./component";
 import { createAppAPI } from "./createApp";
 import { Fragment, Text } from "./vnode";
@@ -43,7 +44,7 @@ export function createRenderer(options) {
     }
   }
 
-  // 初始化挂载
+  // 组件初始化挂载
   function processComponent(
     n1,
     n2: any,
@@ -51,10 +52,26 @@ export function createRenderer(options) {
     parentComponent,
     anchor
   ) {
-    // 初始化 挂载 dom 组件
-    mountComponent(n2, container, parentComponent, anchor);
+    if (!n1) {
+      // 初始化 挂载 dom 组件
+      mountComponent(n2, container, parentComponent, anchor);
+    } else {
+      // 组件更新逻辑
+      updateComponent(n1, n2);
+    }
   }
-
+  function updateComponent(n1, n2) {
+    // 获取到 instance 调用 effect 返回的 runner
+    const instance = (n2.component = n1.component);
+    // 判断是不是需要更新
+    if (shouldUpdateComponent(n1, n2)) {
+      instance.next = n2;
+      instance.update();
+    } else {
+      n2.el = n1.el;
+      n2.vnode = n2;
+    }
+  }
   // slot 只渲染 children 节点
   function processFragment(
     n1,
@@ -338,7 +355,10 @@ export function createRenderer(options) {
     anchor
   ) {
     // 创建组件示例对象
-    const instance = createComponentInstance(initialVNode, parentComponent);
+    const instance = (initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ));
     // 设置 component
     setupComponent(instance);
     setupRenderEffect(instance, initialVNode, container, anchor);
@@ -351,7 +371,8 @@ export function createRenderer(options) {
   ) {
     // 通过使用 effect 依赖收集进行更新操作
     // 判断 instance 的 isMounted 状态 确定是否为初始化流程
-    effect(() => {
+    // 将 effect 返回的 runner  函数 赋值 给 instance 的 update 方法，在更新组件 props 时 再次执行
+    instance.update = effect(() => {
       if (!instance.isMounted) {
         console.log("init-----");
         // 获取setup的数据 绑定到render this 上
@@ -366,6 +387,13 @@ export function createRenderer(options) {
         initialVNode.el = subTree.el;
         instance.isMounted = true;
       } else {
+        console.log("update");
+        //  需要一个 vnode
+        const { next, vnode } = instance;
+        if (next) {
+          next.el = vnode.el;
+          updateComponentPreRender(instance, next);
+        }
         // 获取到 旧的 subTree 以及新的subTree
         const { proxy } = instance;
         // 获取新的 subTree
@@ -380,6 +408,12 @@ export function createRenderer(options) {
   return {
     createApp: createAppAPI(render),
   };
+}
+
+function updateComponentPreRender(instance: any, nextVNode: any) {
+  instance.vnode = nextVNode;
+  instance.next = null;
+  instance.props = nextVNode.props;
 }
 // 获取最长递增子序列
 function getSequence(arr: number[]): number[] {
