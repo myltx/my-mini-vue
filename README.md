@@ -37,6 +37,6 @@
 > - 更新 element diff 双端对比算法 逻辑（2） 中间对比 删除 逻辑
 > - 更新 element diff 双端对比算法 逻辑（3） 中间对比 移动、新增 逻辑
 > - 组件更新 逻辑
-
+> - nextTick 逻辑
 > 课程学习地址
 > ![dce7da28dbf31cf13f2e1d8a2585e29](https://user-images.githubusercontent.com/29727848/159952869-17f82eec-2a21-4dfd-95fa-bb589549c9a0.jpg)

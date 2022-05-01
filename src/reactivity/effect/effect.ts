@@ -17,12 +17,13 @@ let shouldTrack;
 // 通过对象形式创建
 export class ReactiveEffect {
   private _fn: any;
-  public;
   active = true;
   deps = [];
   onStop?: () => void;
-  constructor(fn, public scheduler?) {
+  public scheduler: Function | undefined;
+  constructor(fn, scheduler?: Function) {
     this._fn = fn;
+    this.scheduler = scheduler;
   }
   run() {
     // 判断是不是被 stop 的状态

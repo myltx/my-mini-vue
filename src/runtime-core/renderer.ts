@@ -4,6 +4,7 @@ import { ShapeFlags } from "../shared/ShapeFlags";
 import { shouldUpdateComponent } from "./compomentUpdateUtils";
 import { createComponentInstance, setupComponent } from "./component";
 import { createAppAPI } from "./createApp";
+import { queueJobs } from "./scheduler";
 import { Fragment, Text } from "./vnode";
 
 export function createRenderer(options) {
@@ -372,38 +373,47 @@ export function createRenderer(options) {
     // 通过使用 effect 依赖收集进行更新操作
     // 判断 instance 的 isMounted 状态 确定是否为初始化流程
     // 将 effect 返回的 runner  函数 赋值 给 instance 的 update 方法，在更新组件 props 时 再次执行
-    instance.update = effect(() => {
-      if (!instance.isMounted) {
-        console.log("init-----");
-        // 获取setup的数据 绑定到render this 上
-        const { proxy } = instance;
-        // call -> https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call
-        const subTree = (instance.subTree = instance.render.call(proxy));
-        // subTree => 虚拟节点树 app.js 中设置的 h
-        // vnode => path
-        // vnode => element => mountElement
-        patch(null, subTree, container, instance, anchor);
-        // element -> mount
-        initialVNode.el = subTree.el;
-        instance.isMounted = true;
-      } else {
-        console.log("update");
-        //  需要一个 vnode
-        const { next, vnode } = instance;
-        if (next) {
-          next.el = vnode.el;
-          updateComponentPreRender(instance, next);
+    instance.update = effect(
+      () => {
+        if (!instance.isMounted) {
+          console.log("init-----");
+          // 获取setup的数据 绑定到render this 上
+          const { proxy } = instance;
+          // call -> https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call
+          const subTree = (instance.subTree = instance.render.call(proxy));
+          // subTree => 虚拟节点树 app.js 中设置的 h
+          // vnode => path
+          // vnode => element => mountElement
+          patch(null, subTree, container, instance, anchor);
+          // element -> mount
+          initialVNode.el = subTree.el;
+          instance.isMounted = true;
+        } else {
+          console.log("update");
+          //  需要一个 vnode
+          const { next, vnode } = instance;
+          if (next) {
+            next.el = vnode.el;
+            updateComponentPreRender(instance, next);
+          }
+          // 获取到 旧的 subTree 以及新的subTree
+          const { proxy } = instance;
+          // 获取新的 subTree
+          const subTree = instance.render.call(proxy);
+          const prevTree = instance.subTree;
+          instance.subTree = subTree;
+          console.log("update----");
+          patch(prevTree, subTree, container, instance, anchor);
         }
-        // 获取到 旧的 subTree 以及新的subTree
-        const { proxy } = instance;
-        // 获取新的 subTree
-        const subTree = instance.render.call(proxy);
-        const prevTree = instance.subTree;
-        instance.subTree = subTree;
-        console.log("update----");
-        patch(prevTree, subTree, container, instance, anchor);
+      },
+      {
+        scheduler() {
+          console.log("update -- scheduler");
+          // 收集微任务的 jobs
+          queueJobs(instance.update);
+        },
       }
-    });
+    );
   }
   return {
     createApp: createAppAPI(render),
