@@ -115,7 +115,7 @@ function advanceBy(context: any, length: number) {
   context.source = context.source.slice(length);
 }
 function createRoot(children) {
-  return { children };
+  return { children, type: NodeTypes.ROOT };
 }
 
 function createParserContext(content) {
@@ -123,7 +123,7 @@ function createParserContext(content) {
     source: content,
   };
 }
-
+// 判断是不是需要循环结束
 function isEnd(context, ancestors) {
   const s = context.source;
   // 2. 遇到结束标签 停止循环
