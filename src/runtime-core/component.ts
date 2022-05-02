@@ -58,8 +58,16 @@ function handleSetupResult(instance, setupResult: any) {
   }
   finishComponentSetup(instance);
 }
+// 处理 render 函数
 function finishComponentSetup(instance: any) {
+  // 如果 用户写了就直接赋值  render 函数优先级最高
+  // 如果没有赋值 则转换
   const Component = instance.type;
+  if (compiler && !Component.render) {
+    if (Component.template) {
+      Component.render = compiler(Component.template);
+    }
+  }
   instance.render = Component.render;
   // if (!instance.render) {
   //   instance.render = Component.render;
@@ -72,4 +80,10 @@ export function getCurrentInstance() {
 
 function setCurrentInstance(instance) {
   currentInstance = instance;
+}
+
+let compiler;
+// 注册 compiler事件
+export function registerRuntimeCompiler(_compiler) {
+  compiler = _compiler;
 }

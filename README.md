@@ -47,7 +47,8 @@
 > - 实现代码生成 string 类型 逻辑
 > - 实现代码生成插值类型 逻辑
 > - 实现代码生成三种联合类型
-
+> - 实现编译 template 成 render 函数 逻辑
+> - 完结撒花
 
 > 课程学习地址
 > ![dce7da28dbf31cf13f2e1d8a2585e29](https://user-images.githubusercontent.com/29727848/159952869-17f82eec-2a21-4dfd-95fa-bb589549c9a0.jpg)

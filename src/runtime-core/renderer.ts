@@ -380,7 +380,11 @@ export function createRenderer(options) {
           // 获取setup的数据 绑定到render this 上
           const { proxy } = instance;
           // call -> https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call
-          const subTree = (instance.subTree = instance.render.call(proxy));
+          const subTree = (instance.subTree = renderCall(
+            instance,
+            proxy,
+            proxy
+          ));
           // subTree => 虚拟节点树 app.js 中设置的 h
           // vnode => path
           // vnode => element => mountElement
@@ -399,7 +403,8 @@ export function createRenderer(options) {
           // 获取到 旧的 subTree 以及新的subTree
           const { proxy } = instance;
           // 获取新的 subTree
-          const subTree = instance.render.call(proxy);
+          const subTree = renderCall(instance, proxy, proxy);
+          //  instance.render.call(proxy, proxy);
           const prevTree = instance.subTree;
           instance.subTree = subTree;
           console.log("update----");
@@ -465,4 +470,8 @@ function getSequence(arr: number[]): number[] {
     v = p[v];
   }
   return result;
+}
+// 处理 Tree 数据
+function renderCall(instance, ...args) {
+  return instance.render.call(...args);
 }

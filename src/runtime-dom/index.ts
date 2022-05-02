@@ -49,4 +49,5 @@ const renderer: any = createRenderer({
 export function createApp(...args) {
   return renderer.createApp(...args);
 }
+// 导出 runtime-core 模块
 export * from "../runtime-core";
