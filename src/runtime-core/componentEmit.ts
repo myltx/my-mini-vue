@@ -1,4 +1,4 @@
-import { camelize, toHandlerKey } from "../reactivity/shared";
+import { camelize, toHandlerKey } from "../shared";
 
 export function emit(instance, event, ...args) {
   console.log("emit", event);

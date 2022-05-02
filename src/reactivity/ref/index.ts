@@ -1,6 +1,6 @@
 import { trackEffects, triggerEffects, isTrackIng } from "../effect/effect";
 import { reactive } from "../reactive/reactive";
-import { hasChanged, isObject } from "../shared";
+import { hasChanged, isObject } from "../../shared";
 
 /**
  * ref => 一个key 对应一个 dep  用来做依赖收集

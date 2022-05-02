@@ -1,5 +1,5 @@
 import { effect } from "../reactivity/effect/effect";
-import { EMPTY_OBJ } from "../reactivity/shared";
+import { EMPTY_OBJ } from "../shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { shouldUpdateComponent } from "./compomentUpdateUtils";
 import { createComponentInstance, setupComponent } from "./component";

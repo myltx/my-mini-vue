@@ -9,7 +9,7 @@
  *  5.提供stop方法，调用时停止传入runner的执行
  */
 
-import { extend } from "../shared";
+import { extend } from "../../shared";
 
 let activeEffect;
 let shouldTrack;
